@@ -6,49 +6,62 @@
 - ログはプロジェクトルート直下の logs/ に保存する
 """
 
-from __future__ import annotations
-
 import builtins
-from contextlib import contextmanager
-from datetime import datetime
-from pathlib import Path
-from typing import Iterator
+
+def logs_dir():
+    """logs ディレクトリのパス文字列を返す。（作成は省略、エラーなら手動作成を促す）"""
+    return "logs"
 
 
-def logs_dir() -> Path:
-    """logs ディレクトリの Path を返し、なければ作成する。"""
-    root = Path(__file__).resolve().parents[1]
-    path = root / "logs"
-    path.mkdir(exist_ok=True)
-    return path
-
-
-@contextmanager
-def tee_stdout(run_name: str) -> Iterator[Path]:
+class TeeStdout:
     """
-    print をフックし、コンソールとファイルに同時出力するコンテキストマネージャ。
-
-    Args:
-        run_name: ログファイル名に付与する識別子（例: "run01"）
-
-    Yields:
-        Path: 書き込み先のログファイルパス
+    print をフックし、コンソールとファイルに同時出力するクラス（コンテキストマネージャ）。
+    contextlib 削除のためクラスで実装。
     """
-    log_path = logs_dir() / f"{run_name}-{datetime.now().strftime('%Y%m%d-%H%M%S')}.log"
-    log_file = log_path.open("a", encoding="utf-8")
-    original_print = builtins.print
+    def __init__(self, run_name):
+        self.run_name = run_name
+        self.log_file = None
+        self.original_print = builtins.print
 
-    def _print(*args, **kwargs):
-        sep = kwargs.get("sep", " ")
-        end = kwargs.get("end", "\n")
-        message = sep.join(str(a) for a in args) + end
-        log_file.write(message)
-        log_file.flush()
-        original_print(*args, **kwargs)
+    def __enter__(self):
+        # タイムスタンプなしでファイル名を作成
+        # logs ディレクトリが存在することを前提とする、または例外を無視する
+        log_path = "{0}/{1}.log".format(logs_dir(), self.run_name)
+        
+        # Pybricksでディレクトリ作成は標準では難しい（os.mkdirなどがない場合がある）ため
+        # 事前に logs ディレクトリがあることを期待する、あるいは直下に書く
+        # ここでは logs/runXX.log に追記モードで開く
+        try:
+            self.log_file = open(log_path, "a")
+        except OSError:
+            # logs ディレクトリがないなどの場合、ルートに書く
+            log_path = "{0}.log".format(self.run_name)
+            self.log_file = open(log_path, "a")
 
-    builtins.print = _print
-    try:
-        yield log_path
-    finally:
-        builtins.print = original_print
-        log_file.close()
+        self.log_path = log_path
+
+        def _print(*args, **kwargs):
+            sep = kwargs.get("sep", " ")
+            end = kwargs.get("end", "\n")
+            message = sep.join(str(a) for a in args) + end
+            
+            if self.log_file:
+                self.log_file.write(message)
+                # flush はない場合があるが、あるなら呼ぶ
+                # self.log_file.flush() 
+            
+            self.original_print(*args, **kwargs)
+
+        builtins.print = _print
+        return log_path
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        builtins.print = self.original_print
+        if self.log_file:
+            self.log_file.close()
+
+
+def tee_stdout(run_name):
+    """(旧API互換用) TeeStdout クラスのインスタンスを返す"""
+    return TeeStdout(run_name)
+

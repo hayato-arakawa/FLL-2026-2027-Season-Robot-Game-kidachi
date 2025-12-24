@@ -1,8 +1,10 @@
 import sys
-from pathlib import Path
+# from pathlib import Path
 
 if __package__ is None:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    # sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    pass
+
 
 from pybricks.tools import StopWatch, multitask, run_task, wait
 from setup import initialize_robot
@@ -111,10 +113,15 @@ async def sensor_logger_task(hub, robot, left_wheel, right_wheel):
         error_angle_deg = 0
 
         print(
-            f"{elapsed_time:.0f},{current_dist_mm:.1f},{error_angle_deg:.1f},{current_heading_deg:.1f},"
-            f"{left_angle_deg:.1f},{right_angle_deg:.1f},{angle_diff_deg:.1f},"
-            f"{left_speed_dps:.1f},{right_speed_dps:.1f},{speed_diff_dps:.1f},"
-            f"{kp_dist:.1f},{ki_dist:.1f},{kd_dist:.1f},{kp_head:.1f},{ki_head:.1f},{kd_head:.1f}"
+            "{0:.0f},{1:.1f},{2:.1f},{3:.1f},"
+            "{4:.1f},{5:.1f},{6:.1f},"
+            "{7:.1f},{8:.1f},{9:.1f},"
+            "{10:.1f},{11:.1f},{12:.1f},{13:.1f},{14:.1f},{15:.1f}".format(
+                elapsed_time, current_dist_mm, error_angle_deg, current_heading_deg,
+                left_angle_deg, right_angle_deg, angle_diff_deg,
+                left_speed_dps, right_speed_dps, speed_diff_dps,
+                kp_dist, ki_dist, kd_dist, kp_head, ki_head, kd_head
+            )
         )
 
         await wait(200)

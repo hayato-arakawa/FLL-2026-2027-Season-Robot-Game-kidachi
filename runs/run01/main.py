@@ -1,9 +1,10 @@
 import sys
-from importlib import import_module
-from pathlib import Path
+# from importlib import import_module
+# from pathlib import Path
 
 if __package__ is None:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    # sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    pass
 
 from utils.control import run_with_timing
 from utils.runtime import ensure_project_root
@@ -16,15 +17,18 @@ ACTIVE_VARIANT = "m08_m06_m05"
 
 def load_variant():
     """ACTIVE_VARIANT で指定したモジュールをロードして返す。"""
-    module_path = (
-        f"{__package__}.{ACTIVE_VARIANT}" if __package__ else f"runs.run01.{ACTIVE_VARIANT}"
-    )
-    return import_module(module_path)
+    if __package__:
+        module_path = "{0}.{1}".format(__package__, ACTIVE_VARIANT)
+    else:
+        module_path = "runs.run01.{0}".format(ACTIVE_VARIANT)
+
+    return __import__(module_path, None, None, ["*"])
+
 
 
 async def run(hub, robot, left_wheel, right_wheel, left_lift, right_lift):
     variant = load_variant()
-    label = f"run01:{ACTIVE_VARIANT}"
+    label = "run01:{0}".format(ACTIVE_VARIANT)
     return await run_with_timing(
         label,
         lambda: variant.run(
@@ -44,7 +48,7 @@ if __name__ == "__main__":
 
     hub, robot, left_wheel, right_wheel, left_lift, right_lift = initialize_robot()
     variant = load_variant()
-    label = f"run01:{ACTIVE_VARIANT}"
+    label = "run01:{0}".format(ACTIVE_VARIANT)
 
     async def timed_run():
         await run_with_timing(

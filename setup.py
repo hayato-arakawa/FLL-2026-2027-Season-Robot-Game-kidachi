@@ -300,7 +300,7 @@ def setup_robot_parameters(left_wheel, right_wheel):
 
     # ----- デフォルトの速度・加速度を自動適用 -----
     drivebase.settings(**DEFAULT_STRAIGHT_SETTINGS, **DEFAULT_TURN_SETTINGS)
-    print(f"✓ デフォルト設定適用: 直進={DEFAULT_STRAIGHT_SETTINGS}, 回転={DEFAULT_TURN_SETTINGS}")
+    print("✓ デフォルト設定適用: 直進={0}, 回転={1}".format(DEFAULT_STRAIGHT_SETTINGS, DEFAULT_TURN_SETTINGS))
 
     # Robotクラスでラップして返す
     return Robot(drivebase)

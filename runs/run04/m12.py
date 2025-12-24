@@ -1,8 +1,10 @@
 import sys
-from pathlib import Path
+# from pathlib import Path
 
 if __package__ is None:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    # sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    pass
+
 
 from pybricks.tools import StopWatch, multitask, run_task, wait
 from setup import initialize_robot
@@ -45,8 +47,8 @@ async def sensor_logger_task(hub, robot, left_wheel, right_wheel):
         right_deg = right_wheel.angle()
         dist = robot.distance()
         print(
-            f"LOG[{elapsed_time:5.0f}ms]: dist={dist:4.0f} mm  heading={heading:4.0f}°  "
-            f"L={left_deg:5.0f}°  R={right_deg:5.0f}°"
+            "LOG[{0:5.0f}ms]: dist={1:4.0f} mm  heading={2:4.0f}°  "
+            "L={3:5.0f}°  R={4:5.0f}°".format(elapsed_time, dist, heading, left_deg, right_deg)
         )
         await wait(200)
 

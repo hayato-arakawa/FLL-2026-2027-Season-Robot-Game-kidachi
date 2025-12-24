@@ -3,20 +3,17 @@
 タイムアウトや計測など、制御まわりの共通処理を提供します。
 """
 
-from typing import Awaitable, Callable, TypeVar
-
 from pybricks.tools import StopWatch, wait
 
-T = TypeVar("T")
 
 
 async def run_with_timeout(
-    start_fn: Callable[[], None],
-    done_fn: Callable[[], bool],
-    stop_fn: Callable[[], None],
-    timeout_ms: int,
-    poll_ms: int = 10,
-) -> bool:
+    start_fn,
+    done_fn,
+    stop_fn,
+    timeout_ms,
+    poll_ms=10,
+):
     """
     非同期ループで完了を監視し、タイムアウトで停止する共通関数。
 
@@ -43,7 +40,7 @@ async def run_with_timeout(
     return False
 
 
-async def run_with_timing(label: str, coro_fn: Callable[[], Awaitable[T]]) -> T:
+async def run_with_timing(label, coro_fn):
     """
     実行時間を計測しつつ非同期処理を実行する共通関数。
 
@@ -56,18 +53,18 @@ async def run_with_timing(label: str, coro_fn: Callable[[], Awaitable[T]]) -> T:
     """
     timer = StopWatch()
     timer.reset()
-    print(f"[RUN] {label} start")
+    print("[RUN] {0} start".format(label))
     result = await coro_fn()
     elapsed_ms = timer.time()
-    print(f"[RUN] {label} done ({elapsed_ms:.0f} ms)")
+    print("[RUN] {0} done ({1:.0f} ms)".format(label, elapsed_ms))
     return result
 
 
 def apply_curve_settings(
-    set_settings_fn: Callable[[int, int], None],
-    speed: int | None,
-    acceleration: int | None,
-) -> None:
+    set_settings_fn,
+    speed,
+    acceleration,
+):
     """
     カーブ用の速度・加速度設定を適用するユーティリティ。
 
@@ -76,7 +73,7 @@ def apply_curve_settings(
         speed: 速度（None の場合は適用しない）
         acceleration: 加速度（None の場合は適用しない）
     """
-    params: dict[str, int] = {}
+    params = {}
     if speed is not None:
         params["straight_speed"] = speed
     if acceleration is not None:

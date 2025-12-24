@@ -4,10 +4,12 @@ runXX 配下では main.py と同じ階層に置き、ACTIVE_VARIANT で指定�
 """
 
 import sys
-from pathlib import Path
+# from pathlib import Path
 
 if __package__ is None:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    # sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    pass
+
 
 from pybricks.tools import wait
 from utils.runtime import ensure_project_root
@@ -36,6 +38,6 @@ async def sensor_logger_task(hub, robot, left_wheel, right_wheel):
     global stop_logging
     print("--- センサーログタスク開始 ---")
     while not stop_logging:
-        print(f"LOG: dist={robot.distance():.1f}mm heading={hub.imu.heading():.1f}deg")
+        print("LOG: dist={0:.1f}mm heading={1:.1f}deg".format(robot.distance(), hub.imu.heading()))
         await wait(200)
     print("--- センサーログタスク終了 ---")

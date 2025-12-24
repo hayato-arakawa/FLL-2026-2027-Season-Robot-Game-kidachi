@@ -89,9 +89,11 @@ async def sensor_logger_task(hub, robot, left_wheel, right_wheel):
         left_deg = left_wheel.angle()
         right_deg = right_wheel.angle()
         dist = robot.distance()
+        # f-string を .format() に書き換え
         print(
-            f"LOG[{elapsed_time:5.0f}ms]: dist={dist:4.0f} mm  heading={heading:4.0f}°  "
-            f"L={left_deg:5.0f}°  R={right_deg:5.0f}°"
+            "LOG[{:5.0f}ms]: dist={:4.0f} mm  heading={:4.0f}°  L={:5.0f}°  R={:5.0f}°".format(
+                elapsed_time, dist, heading, left_deg, right_deg
+            )
         )
         await wait(200)  # 200ミリ秒待機して、他のタスクに実行を譲る
 
@@ -102,4 +104,5 @@ async def main():
 
 if __name__ == "__main__":
     hub, robot, left_wheel, right_wheel, left_lift, right_lift = initialize_robot()
-    run_task(multitask(sensor_logger_task(hub, robot, left_wheel, right_wheel), main()))
+    run_task(multitask(sensor_logger_task(
+        hub, robot, left_wheel, right_wheel), main()))

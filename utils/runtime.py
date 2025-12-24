@@ -7,34 +7,27 @@
 """
 
 import sys
-from pathlib import Path
-from typing import Union
-
-PathLike = Union[str, Path]
 
 
-def ensure_project_root(current_file: PathLike) -> Path:
+def ensure_project_root(current_file):
     """
     スクリプトの位置からプロジェクトルートを探索し、sys.path に追加して返す。
-
-    探索基準:
-    - pyproject.toml または .git があるディレクトリをルートとみなす
-    - 見つからない場合は最上位ディレクトリを返す
+    Pybricks MicroPython 互換のため pathlib や複雑な探索は削除。
+    3階層上 (runs/runXX/main.py から見たルート) をルートと仮定する。
     """
-    path = Path(current_file).resolve()
-    candidates = [path.parent, *path.parents]
+    # 簡易的なパス操作: 文字列として扱う
+    # current_file は __file__ (例: "runs/run01/main.py")
+    
+    # パス区切り文字の正規化（念のため）
+    path_str = str(current_file).replace("\\", "/")
+    
+    # 簡易的に "../.." 相当のパスを追加
+    # 注: Pybricksでは絶対パス取得が難しいため、相対パスで sys.path に追加する
+    # runs/runXX/main.py -> ルートは 2階層上だが、
+    # 念のため sys.path に "." も追加しておく
+    
+    if "." not in sys.path:
+        sys.path.append(".")
+        
+    return "."
 
-    project_root = None
-    for candidate in candidates:
-        if (candidate / "pyproject.toml").exists() or (candidate / ".git").exists():
-            project_root = candidate
-            break
-
-    if project_root is None:
-        project_root = path.parents[-1]
-
-    root_str = str(project_root)
-    if root_str not in sys.path:
-        sys.path.insert(0, root_str)
-
-    return project_root

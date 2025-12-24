@@ -98,7 +98,7 @@ async def reset_robot():
         print("ロボットリソースをリセットしました")
     except Exception as e:
         # エラーが発生した場合はメッセージを表示
-        print(f"リセットエラー: {e}")
+        print("リセットエラー: {0}".format(e))
 
 
 # ===== センサーログを記録するタスク =====
@@ -148,8 +148,10 @@ async def sensor_logger_task():
         # 読み取った値を画面に表示（フォーマットを整えて見やすく）
         print(
             "LOG["
-            f"{elapsed_time:5.0f}ms]: dist={dist:4.0f} mm  "
-            f"heading={heading:4.0f}°  L={left_deg:5.0f}°  R={right_deg:5.0f}°"
+            "{0:5.0f}ms]: dist={1:4.0f} mm  "
+            "heading={2:4.0f}°  L={3:5.0f}°  R={4:5.0f}°".format(
+                elapsed_time, dist, heading, left_deg, right_deg
+            )
         )
 
         # 0.2秒（200ミリ秒）待機して、次の記録まで待つ
@@ -193,7 +195,7 @@ async def selector_task():
             hub.light.on(Color.GREEN)  # ハブのライトを緑色に点灯
             await wait(100)  # 0.1秒待つ（awaitで他のタスクに譲る）
             hub.light.off()  # ライトを消す
-            print(f"→ プログラム {program_id} に変更")
+            print("→ プログラム {0} に変更".format(program_id))
 
         # 【左ボタンが押された場合】前のプログラムに戻る
         elif Button.LEFT in pressed_buttons:
@@ -202,17 +204,17 @@ async def selector_task():
             hub.light.on(Color.BLUE)  # ハブのライトを青色に点灯
             await wait(100)  # 0.1秒待つ（awaitで他のタスクに譲る）
             hub.light.off()  # ライトを消す
-            print(f"← プログラム {program_id} に変更")
+            print("← プログラム {0} に変更".format(program_id))
 
         # ----- フォースセンサーでプログラム実行 -----
         # フォースセンサーが0.5以上の力で押されたら、プログラムを実行
         if await button.force() >= 0.5:
             hub.light.on(Color.RED)  # ハブのライトを赤色に点灯（実行中を示す）
-            print(f"=== プログラム {program_id} を実行中 ===")
+            print("=== プログラム {0} を実行中 ===".format(program_id))
 
-            log_name = f"run{display_num:02d}"
+            log_name = "run{0:02d}".format(display_num)
             with tee_stdout(log_name) as log_path:
-                print(f"[LOG] 出力をファイルにも記録します: {log_path}")
+                print("[LOG] 出力をファイルにも記録します: {0}".format(log_path))
                 try:
                     # ----- 実行前の準備 -----
                     await reset_robot()  # ロボットをリセット（awaitで待つ）
@@ -243,11 +245,11 @@ async def selector_task():
                             right_lift,
                         )
 
-                    print(f"=== プログラム {program_id} 実行完了 ===")
+                    print("=== プログラム {0} 実行完了 ===".format(program_id))
 
                 except Exception as e:
                     # ----- エラーが発生した場合の処理 -----
-                    print(f"エラー: {e}")  # エラーメッセージを表示
+                    print("エラー: {0}".format(e))  # エラーメッセージを表示
                     hub.light.on(Color.RED)  # 赤いライトを点灯してエラーを知らせる
                     await wait(500)  # 0.5秒待つ
                     hub.light.off()  # ライトを消す
@@ -257,7 +259,7 @@ async def selector_task():
                         await reset_robot()  # 実行後にロボットをリセット
                         await wait(50)  # リセット後に少し待機（0.05秒）
                     except Exception as e:
-                        print(f"リセットエラー: {e}")
+                        print("リセットエラー: {0}".format(e))
 
             hub.light.off()  # ライトを消す
             print("セレクターに戻りました")
